@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 public interface IHackerNewsService
 {
     Task<IEnumerable<HackerNewsStory>> GetNewStories(int loadedPages);
-    IEnumerable<HackerNewsStory> SearchStories(string searchTerm);
-    IEnumerable<HackerNewsStory> StoriesCache { get; }
+    Task<IEnumerable<HackerNewsStory>> SearchStories(string searchTerm);
 
 }

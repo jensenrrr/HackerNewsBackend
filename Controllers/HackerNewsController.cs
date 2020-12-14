@@ -13,12 +13,10 @@ namespace HackerNewsApi.Controllers
     public class HackerNewsController : ControllerBase
     {
 
-        private readonly ILogger<HackerNewsController> _logger;
         private readonly IHackerNewsService _newsService;
 
-        public HackerNewsController(ILogger<HackerNewsController> logger, IHackerNewsService newsService)
+        public HackerNewsController(IHackerNewsService newsService)
         {
-            _logger = logger;
             _newsService = newsService;
         }
 
@@ -33,7 +31,7 @@ namespace HackerNewsApi.Controllers
         [Route("searchNewStories/{searchTerm}")]
         public IEnumerable<HackerNewsStory> SearchNewStories(string searchTerm)
         {
-            return _newsService.SearchStories(searchTerm);
+            return _newsService.SearchStories(searchTerm).Result;
         }
     }
 }

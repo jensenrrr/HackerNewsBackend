@@ -11,10 +11,70 @@ using Newtonsoft.Json;
 public class HackerNewsService : IHackerNewsService
 {
 	private readonly IHttpClientFactory _clientFactory;
-    public IEnumerable<HackerNewsStory> StoriesCache { get; private set; } = new List<HackerNewsStory>() { };
+    private IEnumerable<HackerNewsStory> _storiesCache = new List<HackerNewsStory>() { };
 	public HackerNewsService(IHttpClientFactory clientFactory)
 	{
 		_clientFactory = clientFactory;
+    }
+
+    public async Task<IEnumerable<HackerNewsStory>> SearchStories(string searchTerm)
+    {
+        if (_storiesCache == null || !_storiesCache.Any() || _storiesCache.Count() == 0)
+        {
+            await FetchNewsStories();
+        }
+        return _storiesCache.ToList().Where(story => 
+            story.By.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || 
+            story.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
+    }
+
+    public async Task<IEnumerable<HackerNewsStory>> GetNewStories(int loadedPages)
+    {
+        if (_storiesCache == null || !_storiesCache.Any() || _storiesCache.Count() == 0)
+        {
+            await FetchNewsStories();
+            return _storiesCache.ToList().GetRange(0, 20);
+        }
+        else
+        {
+            var count = 20;
+            if (loadedPages + count >= _storiesCache.Count())
+            {
+                count = _storiesCache.Count() - loadedPages;
+            }
+            if (loadedPages >= _storiesCache.Count())
+            {
+                return null;
+            }
+            return _storiesCache.ToList().GetRange(loadedPages, count);
+        }
+
+    }
+    private async Task FetchNewsStories()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "https://hacker-news.firebaseio.com/v0/newstories.json");
+        var client = _clientFactory.CreateClient();
+        var response = await client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+        {
+            using var responseStream = await response.Content.ReadAsStreamAsync();
+            var storyIDs = await System.Text.Json.JsonSerializer.DeserializeAsync<IEnumerable<int>>(responseStream);
+            var taskArray = new List<Task<HackerNewsStory>>() { };
+            foreach (var id in storyIDs)
+            {
+                taskArray.Add(GetStory(id));
+            }
+            await Task.WhenAll(taskArray);
+            var returnedStories = new List<HackerNewsStory>() { };
+            foreach (var task in taskArray)
+            {
+                if (task.Result != null)
+                {
+                    returnedStories.Add(task.Result);
+                }
+            }
+            _storiesCache = returnedStories.OrderBy(story => story.Time);
+        }
     }
     private async Task<HackerNewsStory> GetStory(int storyID)
     {
@@ -32,60 +92,7 @@ public class HackerNewsService : IHackerNewsService
             return null;
         }
     }
-	public async Task<IEnumerable<HackerNewsStory>> GetNewStories(int loadedPages)
-    {
-        if (StoriesCache == null || !StoriesCache.Any() || StoriesCache.Count() == 0)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://hacker-news.firebaseio.com/v0/newstories.json");
-            var client = _clientFactory.CreateClient();
-            var response = await client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                var storyIDs = await System.Text.Json.JsonSerializer.DeserializeAsync<IEnumerable<int>>(responseStream);
-                storyIDs = storyIDs.Take(64);
-                var taskArray = new List<Task<HackerNewsStory>>() { };
-                foreach (var id in storyIDs)
-                {
-                    taskArray.Add(GetStory(id));
-                }
-                await Task<HackerNewsStory>.WhenAll(taskArray);
-                var returnedStories = new List<HackerNewsStory>() { };
-                foreach (var task in taskArray)
-                {
-                    if (task.Result != null)
-                    {
-                        returnedStories.Add(task.Result);
-                    }
-                }
-                StoriesCache = returnedStories.OrderBy(story => story.Time);
-                return StoriesCache.ToList().GetRange(0, 20);
-            }
-            else
-            {
-                return StoriesCache;
-            }
-        }
-        else
-        {
-            var count = 20;
-            if (loadedPages + count >= StoriesCache.Count())
-            {
-                count = StoriesCache.Count() - loadedPages;
-            }
-            if(loadedPages>= StoriesCache.Count())
-            {
-                return null;
-            }
-            return StoriesCache.ToList().GetRange(loadedPages, count); 
-        }
-        
-    }
-    public IEnumerable<HackerNewsStory> SearchStories(string searchTerm)
-    {        
-        return StoriesCache.ToList().Where(story => 
-                story.By.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || 
-                story.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
-    }
+
+
 
 }
