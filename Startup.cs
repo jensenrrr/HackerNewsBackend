@@ -26,12 +26,13 @@ namespace HackerNewsApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddHttpClient();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HackerNewsApi", Version = "v1" });
             });
+            services.AddSingleton<IHackerNewsService, HackerNewsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +48,17 @@ namespace HackerNewsApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(builder =>
+            {
+                builder
+                    .WithOrigins("*")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+
+            });
+
+            app.UseResponseCaching();
 
             app.UseAuthorization();
 

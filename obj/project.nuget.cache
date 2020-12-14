@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "0YFH/ndafVc94OEE2Zh8CZZBJbK6VzE6eZq3Ch5tJhGc8yFsSktEKA8h9wFx5ziRzrLN3RH6qt5hgE5FIx0euA==",
+  "dgSpecHash": "nrxGj0zTWEVQdwcymcGvKDvTvyw5zlUxmoEU8PsQ5h3W88un7QcGvQk2ljNNEwt7PrG1/Fk7sku7p66izbbT3Q==",
   "success": true,
   "projectFilePath": "C:\\Users\\Jensen\\Documents\\HackerNewsApi\\HackerNewsApi.csproj",
   "expectedPackageFiles": [
@@ -14,6 +14,7 @@
     "C:\\Users\\Jensen\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\6.7.1\\microsoft.identitymodel.protocols.openidconnect.6.7.1.nupkg.sha512",
     "C:\\Users\\Jensen\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.7.1\\microsoft.identitymodel.tokens.6.7.1.nupkg.sha512",
     "C:\\Users\\Jensen\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",
+    "C:\\Users\\Jensen\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\Jensen\\.nuget\\packages\\swashbuckle.aspnetcore\\5.6.3\\swashbuckle.aspnetcore.5.6.3.nupkg.sha512",
     "C:\\Users\\Jensen\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\5.6.3\\swashbuckle.aspnetcore.swagger.5.6.3.nupkg.sha512",
     "C:\\Users\\Jensen\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\5.6.3\\swashbuckle.aspnetcore.swaggergen.5.6.3.nupkg.sha512",

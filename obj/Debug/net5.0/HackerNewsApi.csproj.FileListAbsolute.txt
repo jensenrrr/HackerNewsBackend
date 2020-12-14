@@ -35,3 +35,4 @@ C:\Users\Jensen\Documents\HackerNewsApi\obj\Debug\net5.0\HackerNewsApi.dll
 C:\Users\Jensen\Documents\HackerNewsApi\obj\Debug\net5.0\ref\HackerNewsApi.dll
 C:\Users\Jensen\Documents\HackerNewsApi\obj\Debug\net5.0\HackerNewsApi.pdb
 C:\Users\Jensen\Documents\HackerNewsApi\obj\Debug\net5.0\HackerNewsApi.genruntimeconfig.cache
+C:\Users\Jensen\Documents\HackerNewsApi\bin\Debug\net5.0\Newtonsoft.Json.dll

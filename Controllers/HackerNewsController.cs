@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,48 +9,31 @@ using Microsoft.Extensions.Logging;
 namespace HackerNewsApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class HackerNewsController : ControllerBase
     {
 
         private readonly ILogger<HackerNewsController> _logger;
+        private readonly IHackerNewsService _newsService;
 
-        public HackerNewsController(ILogger<HackerNewsController> logger)
+        public HackerNewsController(ILogger<HackerNewsController> logger, IHackerNewsService newsService)
         {
             _logger = logger;
+            _newsService = newsService;
         }
 
         [HttpGet]
-        [Route("loadNewStories")]
-        public IEnumerable<HackerNewsStory> LoadNewStories()
+        [Route("loadNewStories/{loadedPages}")]
+        public IEnumerable<HackerNewsStory> LoadNewStories(int loadedPages)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new HackerNewsStory
-            {
-                By = "guy",
-                Score = 5,
-                Time = 6,
-                Title = "title",
-                URL="url"
-            })
-            .ToArray();
+            return _newsService.GetNewStories(loadedPages).Result;
         }
 
         [HttpGet]
-        [Route("searchNewStories")]
-
-        public IEnumerable<HackerNewsStory> SearchNewStories()
+        [Route("searchNewStories/{searchTerm}")]
+        public IEnumerable<HackerNewsStory> SearchNewStories(string searchTerm)
         {
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new HackerNewsStory
-            {
-                By = "guy",
-                Score = 5,
-                Time = 6,
-                Title = "title",
-                URL = "url"
-            })
-            .ToArray();
+            return _newsService.SearchStories(searchTerm);
         }
     }
 }
