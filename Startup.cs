@@ -32,6 +32,7 @@ namespace HackerNewsApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HackerNewsApi", Version = "v1" });
             });
+
             services.AddSingleton<IHackerNewsService, HackerNewsService>();
         }
 
@@ -66,6 +67,8 @@ namespace HackerNewsApi
             {
                 endpoints.MapControllers();
             });
+
+            app.ApplicationServices.GetService<IHackerNewsService>();
         }
     }
 }

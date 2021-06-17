@@ -1,4 +1,4 @@
-﻿using HackerNewsApi;
+using HackerNewsApi;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ public class HackerNewsService : IHackerNewsService
 	public HackerNewsService(IHttpClientFactory clientFactory)
 	{
 		_clientFactory = clientFactory;
+        _ = FetchNewsStories();
     }
 
     public async Task<IEnumerable<HackerNewsStory>> SearchStories(string searchTerm)
