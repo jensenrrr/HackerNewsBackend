@@ -1,4 +1,4 @@
-using HackerNewsApi;
+﻿using HackerNewsApi;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -25,32 +25,31 @@ public class HackerNewsService : IHackerNewsService
             await FetchNewsStories();
         }
         return _storiesCache.ToList().Where(story => 
-            story.By.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || 
+            story.By.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 ||
             story.Title.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);
     }
 
-    public async Task<IEnumerable<HackerNewsStory>> GetNewStories(int loadedPages)
+    public async Task<IEnumerable<HackerNewsStory>> GetNewStories(int loadedPages, int storyCount)
     {
+        if(loadedPages < 0 || storyCount < 0){
+            return new List<HackerNewsStory>();
+        }
         if (_storiesCache == null || !_storiesCache.Any() || _storiesCache.Count() == 0)
         {
             await FetchNewsStories();
-            return _storiesCache.ToList().GetRange(0, 20);
+            return _storiesCache.ToList().GetRange(0, storyCount);
         }
         else
         {
-            var count = 20;
-            if (loadedPages + count >= _storiesCache.Count())
+            if (loadedPages + storyCount  > _storiesCache.Count())
             {
-                count = _storiesCache.Count() - loadedPages;
+                return new List<HackerNewsStory>();
             }
-            if (loadedPages >= _storiesCache.Count())
-            {
-                return null;
-            }
-            return _storiesCache.ToList().GetRange(loadedPages, count);
+            return _storiesCache.ToList().GetRange(loadedPages, storyCount);
         }
 
     }
+
     private async Task FetchNewsStories()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "https://hacker-news.firebaseio.com/v0/newstories.json");
@@ -60,12 +59,14 @@ public class HackerNewsService : IHackerNewsService
         {
             using var responseStream = await response.Content.ReadAsStreamAsync();
             var storyIDs = await System.Text.Json.JsonSerializer.DeserializeAsync<IEnumerable<int>>(responseStream);
+
             var taskArray = new List<Task<HackerNewsStory>>() { };
             foreach (var id in storyIDs)
             {
                 taskArray.Add(GetStory(id));
             }
             await Task.WhenAll(taskArray);
+
             var returnedStories = new List<HackerNewsStory>() { };
             foreach (var task in taskArray)
             {
@@ -74,9 +75,11 @@ public class HackerNewsService : IHackerNewsService
                     returnedStories.Add(task.Result);
                 }
             }
+
             _storiesCache = returnedStories.OrderBy(story => story.Time);
         }
     }
+
     private async Task<HackerNewsStory> GetStory(int storyID)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"https://hacker-news.firebaseio.com/v0/item/{storyID.ToString()}.json");
@@ -85,15 +88,10 @@ public class HackerNewsService : IHackerNewsService
         if (response.IsSuccessStatusCode)
         {
             var contents = await response.Content.ReadAsStringAsync();
-            var story = JsonConvert.DeserializeObject<HackerNewsStory>(contents);
-            return story;
-        }
+            return JsonConvert.DeserializeObject<HackerNewsStory>(contents);        }
         else
         {
             return null;
         }
     }
-
-
-
 }

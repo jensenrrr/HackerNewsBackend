@@ -21,10 +21,10 @@ namespace HackerNewsApi.Controllers
         }
 
         [HttpGet]
-        [Route("loadNewStories/{loadedPages}")]
-        public IEnumerable<HackerNewsStory> LoadNewStories(int loadedPages)
+        [Route("loadNewStories/{loadedPages}/{storyCount}")]
+        public IEnumerable<HackerNewsStory> LoadNewStories(int loadedPages, int storyCount)
         {
-            return _newsService.GetNewStories(loadedPages).Result;
+            return _newsService.GetNewStories(loadedPages, storyCount).Result;
         }
 
         [HttpGet]
